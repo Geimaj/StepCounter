@@ -1,15 +1,17 @@
 package com.example.jamie.stepcounter;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
+public class MainActivity extends AppCompatActivity implements Fragment3.OnFragmentInteractionListener{
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private SectionsPageAdapter sectionsPageAdapter;
 
     private final String[] tabHeadings = {"Daily", "Progress", "Diary"};
 
@@ -17,49 +19,22 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //add toolbar to activity
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         //init tab layout
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-
-        //add tabs
-        for (String heading : tabHeadings) {
-            tabLayout.addTab(tabLayout.newTab().setText(heading));
-        }
-
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-
+        tabLayout = (TabLayout) findViewById(R.id.main_tabLayout);
         //init viewPager
-        viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager = (ViewPager) findViewById(R.id.main_pager);
 
         //create page adapter
-        Pager adapter = new Pager(getSupportFragmentManager(), tabLayout.getTabCount());
-
+        sectionsPageAdapter = new SectionsPageAdapter(getSupportFragmentManager());
         //add adapter to pager
-        viewPager.setAdapter(adapter);
+        viewPager.setAdapter(sectionsPageAdapter);
 
-        //add onSelectedTabListener to swipe views
-        tabLayout.setOnTabSelectedListener(this);
-
-
-    }
-
-
-    @Override
-    public void onTabSelected(TabLayout.Tab tab) {
-        tabLayout.setScrollPosition(tab.getPosition(), 0f,true);
-        viewPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(TabLayout.Tab tab) {
+        tabLayout.setupWithViewPager(viewPager);
 
     }
 
     @Override
-    public void onTabReselected(TabLayout.Tab tab) {
+    public void onFragmentInteraction(Uri uri) {
 
     }
 }
