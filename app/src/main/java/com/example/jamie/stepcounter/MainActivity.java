@@ -7,13 +7,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-public class MainActivity extends AppCompatActivity implements Fragment3.OnFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements Fragment3.OnFragmentInteractionListener {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private SectionsPageAdapter sectionsPageAdapter;
-
-    private final String[] tabHeadings = {"Daily", "Progress", "Diary"};
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

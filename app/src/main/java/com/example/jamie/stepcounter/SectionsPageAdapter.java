@@ -7,6 +7,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 class SectionsPageAdapter extends FragmentPagerAdapter {
 
+    private final String[] tabHeadings = {"Daily", "Progress", "Diary"};
+
     public SectionsPageAdapter(FragmentManager fm) {
         super(fm);
     }
@@ -17,9 +19,9 @@ class SectionsPageAdapter extends FragmentPagerAdapter {
             case 0:
                 return new Fragment1();
             case 1:
-                return  new Fragment2();
+                return new Fragment2();
             case 2:
-                return  new Fragment3();
+                return new Fragment3();
             default:
                 return null;
         }
@@ -29,20 +31,14 @@ class SectionsPageAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         super.getPageTitle(position);
-        switch (position){
-            case 0:
-                return "TAB 1";
-            case 1:
-                return  "Tabular 2";
-            case 2:
-                return  "3 TABS";
-            default:
-                return null;
+        if(position >= 0 && position <= tabHeadings.length){
+            return tabHeadings[position];
         }
+        return null;
     }
 
     @Override
     public int getCount() {
-        return 3;
+        return tabHeadings.length;
     }
 }
