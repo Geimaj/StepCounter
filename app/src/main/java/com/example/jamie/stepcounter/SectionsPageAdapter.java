@@ -10,7 +10,6 @@ import java.util.List;
 
 class SectionsPageAdapter extends FragmentPagerAdapter {
 
-    private final String[] tabHeadings = {"Daily", "Progress", "Diary"};
 
     private List<Fragment> fragments;
     private List<String> titles;
@@ -30,17 +29,6 @@ class SectionsPageAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-//        switch (position){
-//            case 0:
-//                return new Fragment1();
-//            case 1:
-//                return new Fragment2();
-//            case 2:
-//                return new Fragment3();
-//            default:
-//                return null;
-//        }
-        //
         if(position >= 0 && position <= fragments.size()){
             return fragments.get(position);
         }

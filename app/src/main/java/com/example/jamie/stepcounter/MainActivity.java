@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
 public class MainActivity extends AppCompatActivity implements Fragment3.OnFragmentInteractionListener {
 
@@ -25,9 +24,9 @@ public class MainActivity extends AppCompatActivity implements Fragment3.OnFragm
         //create page adapter
         sectionsPageAdapter = new SectionsPageAdapter(getSupportFragmentManager());
         //add fragments to adapter
-        sectionsPageAdapter.addFragment(new Fragment1(), "Frag 1");
-        sectionsPageAdapter.addFragment(new Fragment2(), "Frag TWO");
-        sectionsPageAdapter.addFragment(new Fragment3(), "Fragment 3");
+        sectionsPageAdapter.addFragment(new DailyFragment(), "Daily");
+        sectionsPageAdapter.addFragment(new HistoryFragment(), "History");
+        sectionsPageAdapter.addFragment(new Fragment3(), "Diary");
 
         //add adapter to pager
         viewPager.setAdapter(sectionsPageAdapter);
