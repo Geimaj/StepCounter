@@ -24,6 +24,11 @@ public class MainActivity extends AppCompatActivity implements Fragment3.OnFragm
 
         //create page adapter
         sectionsPageAdapter = new SectionsPageAdapter(getSupportFragmentManager());
+        //add fragments to adapter
+        sectionsPageAdapter.addFragment(new Fragment1(), "Frag 1");
+        sectionsPageAdapter.addFragment(new Fragment2(), "Frag TWO");
+        sectionsPageAdapter.addFragment(new Fragment3(), "Fragment 3");
+
         //add adapter to pager
         viewPager.setAdapter(sectionsPageAdapter);
 
