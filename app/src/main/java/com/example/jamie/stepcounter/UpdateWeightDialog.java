@@ -2,7 +2,9 @@ package com.example.jamie.stepcounter;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.TextInputEditText;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,18 +14,23 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+
 
 public class UpdateWeightDialog extends Dialog {
 
-    private Activity activity;
     private Button confirmWeightButton;
     private Button cancelButton;
     private TextInputEditText weightInput;
     private TextView errorMessageTextView;
+    private Activity actvity;
 
     public UpdateWeightDialog(Activity a) {
         super(a);
-        this.activity = a;
+        this.actvity = a;
     }
 
     public void onCreate(Bundle savedInstanceState) {
@@ -71,7 +78,26 @@ public class UpdateWeightDialog extends Dialog {
                 String weight = weightInput.getText().toString();
                 //check valid weight
                 if(validWeight(weight)){
-                    Log.d("JAMIE",weight);
+                    //apped weight to file
+
+                    String filename = "weights";
+                    File path = getContext().getFilesDir();
+                    File weights = new File(path, filename);
+
+                    try {
+                        weights.getParentFile().mkdirs();
+//                        weights.mkdirs();
+                        FileOutputStream fos = new FileOutputStream(weights, true);
+                        //add new line
+                        fos.write("\n".getBytes());
+                        //add data
+                        fos.write( weight.getBytes());
+                        fos.close();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                     dismiss();
                 }
             }
