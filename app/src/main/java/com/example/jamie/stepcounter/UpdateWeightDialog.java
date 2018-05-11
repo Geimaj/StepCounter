@@ -79,24 +79,8 @@ public class UpdateWeightDialog extends Dialog {
                 //check valid weight
                 if(validWeight(weight)){
                     //apped weight to file
-
-                    String filename = "weights";
-                    File path = getContext().getFilesDir();
-                    File weights = new File(path, filename);
-
-                    try {
-                        weights.getParentFile().mkdirs();
-//                        weights.mkdirs();
-                        FileOutputStream fos = new FileOutputStream(weights, true);
-                        //add new line
-                        fos.write("\n".getBytes());
-                        //add data
-                        fos.write( weight.getBytes());
-                        fos.close();
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    StorageHandler sh = new StorageHandler(getContext());
+                    sh.saveWeight(weight);
 
                     dismiss();
                 }
