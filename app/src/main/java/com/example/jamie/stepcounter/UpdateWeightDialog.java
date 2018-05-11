@@ -27,6 +27,8 @@ public class UpdateWeightDialog extends Dialog {
     private TextInputEditText weightInput;
     private TextView errorMessageTextView;
     private Activity actvity;
+    private StorageChanged storageChangedInterface;
+//    OnDia
 
     public UpdateWeightDialog(Activity a) {
         super(a);
@@ -65,9 +67,12 @@ public class UpdateWeightDialog extends Dialog {
                 String age = s.toString();
                 if(validWeight(age)){
                     errorMessageTextView.setVisibility(View.GONE);
+                    confirmWeightButton.setEnabled(true);
+
                 } else {
                     errorMessageTextView.setText("Invalid weight");
                     errorMessageTextView.setVisibility(View.VISIBLE);
+                    confirmWeightButton.setEnabled(false);
                 }
             }
         });
@@ -82,6 +87,9 @@ public class UpdateWeightDialog extends Dialog {
                     StorageHandler sh = new StorageHandler(getContext());
                     sh.saveWeight(weight);
 
+                    //callback
+                    storageChangedInterface.weightChanged();
+
                     dismiss();
                 }
             }
@@ -94,6 +102,10 @@ public class UpdateWeightDialog extends Dialog {
             }
         });
 
+    }
+
+    public void setInterface(StorageChanged sc){
+        this.storageChangedInterface = sc;
     }
 
     private boolean validWeight(String weight){
@@ -111,5 +123,6 @@ public class UpdateWeightDialog extends Dialog {
         }
         return result;
     }
+
 
 }
