@@ -89,7 +89,8 @@ public class UpdateWeightDialog extends Dialog {
 
                     //callback
                     storageChangedInterface.weightChanged();
-
+                    //clear input
+                    weightInput.setText("");
                     dismiss();
                 }
             }
@@ -98,6 +99,8 @@ public class UpdateWeightDialog extends Dialog {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //clear input
+                weightInput.setText("");
                 dismiss();
             }
         });

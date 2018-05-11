@@ -5,4 +5,5 @@
     <color name="colorAccent">#FF4081</color>
     <color name="tabSelectedColor">#ab47bc</color>
     <color name="tabTextColor">#ffffff</color>
+    <color name="textError">#d50000</color>
 </resources>
