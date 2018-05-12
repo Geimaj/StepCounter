@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <PreferenceCategory
+        android:key="units_category"
+        android:title="Units">
+
+       <SwitchPreference
+           android:title="Metric">
+        </SwitchPreference>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="goal_category"
+        android:title="Goals">
+        <EditTextPreference
+            android:dialogTitle="Steps"
+            android:dialogMessage="Set goal for dialy steps"
+            android:inputType="number"
+            android:key="key_steps"
+            android:title="Steps"
+            android:summary="Set daily step goal">
+        </EditTextPreference>
+
+        <EditTextPreference
+            android:dialogTitle="Weight"
+            android:dialogMessage="Set goal for weight"
+            android:inputType="number"
+            android:key="key_weight"
+            android:title="Weight"
+            android:summary="Set weight goal">
+        </EditTextPreference>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="user_category"
+        android:title="User">
+
+        <EditTextPreference
+            android:dialogTitle="Username"
+            android:dialogMessage="Change username"
+            android:inputType="textCapWords"
+            android:key="key_username"
+            android:title="Name"
+            android:summary="Jamie joo">
+        </EditTextPreference>
+
+        <EditTextPreference
+            android:dialogTitle="Password"
+            android:dialogMessage="Change password"
+            android:inputType="textCapWords"
+            android:key="key_password"
+            android:title="Password"
+            android:summary="Change your password">
+        </EditTextPreference>
+
+    </PreferenceCategory>
+
+
+
+</PreferenceScreen>

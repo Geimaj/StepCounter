@@ -1,20 +1,33 @@
 package com.example.jamie.stepcounter;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity implements Fragment3.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements DiaryFragment.OnFragmentInteractionListener {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private SectionsPageAdapter sectionsPageAdapter;
+    private LoginActivity loginActivity;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //display login
+        loginActivity = new LoginActivity();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         //init tab layout
         tabLayout = (TabLayout) findViewById(R.id.main_tabLayout);
@@ -26,13 +39,27 @@ public class MainActivity extends AppCompatActivity implements Fragment3.OnFragm
         //add fragments to adapter
         sectionsPageAdapter.addFragment(new DailyFragment(), "Daily");
         sectionsPageAdapter.addFragment(new HistoryFragment(), "History");
-        sectionsPageAdapter.addFragment(new Fragment3(), "Diary");
+        sectionsPageAdapter.addFragment(new DiaryFragment(), "Dairy");
 
         //add adapter to pager
         viewPager.setAdapter(sectionsPageAdapter);
-
         tabLayout.setupWithViewPager(viewPager);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
+
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
