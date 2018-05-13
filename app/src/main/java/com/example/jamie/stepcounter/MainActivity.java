@@ -10,7 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity implements DiaryFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements DiaryFragment.OnF
         //add fragments to adapter
         sectionsPageAdapter.addFragment(new DailyFragment(), "Daily");
         sectionsPageAdapter.addFragment(new HistoryFragment(), "History");
-        sectionsPageAdapter.addFragment(new DiaryFragment(), "Dairy");
+        sectionsPageAdapter.addFragment(new DiaryFragment(), "Diary");
 
         //add adapter to pager
         viewPager.setAdapter(sectionsPageAdapter);
@@ -62,8 +62,5 @@ public class MainActivity extends AppCompatActivity implements DiaryFragment.OnF
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onFragmentInteraction(Uri uri) {
 
-    }
 }
