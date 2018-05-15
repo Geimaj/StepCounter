@@ -7,7 +7,9 @@
         android:title="Units">
 
        <SwitchPreference
-           android:title="Metric">
+           android:title="Metric"
+           android:key="units"
+           android:defaultValue="true">
         </SwitchPreference>
 
     </PreferenceCategory>

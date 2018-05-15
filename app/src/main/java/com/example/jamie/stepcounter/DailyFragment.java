@@ -1,7 +1,9 @@
 package com.example.jamie.stepcounter;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,7 +16,7 @@ import android.widget.TextView;
 /**
  * A simple {@link Fragment} subclass.s
  */
-public class DailyFragment extends Fragment {
+public class DailyFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     private Button updateWeightButton;
 //    private View.OnClickListener updateWeightHandler;
@@ -22,6 +24,7 @@ public class DailyFragment extends Fragment {
     private StorageHandler storage;
     private StorageChanged storageChangedInterface;
     private UpdateWeightDialog weightDialog;
+    private SharedPreferences preferences;
 
 
     public DailyFragment() {
@@ -32,6 +35,10 @@ public class DailyFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_daily, container, false);
+
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        PreferenceManager.getDefaultSharedPreferences(getContext()).registerOnSharedPreferenceChangeListener(this);
 
         storage = new StorageHandler(getContext());
 
@@ -59,7 +66,7 @@ public class DailyFragment extends Fragment {
                 displayCurrentWeight();
             }
         });
-
+        
         //update weight value
         displayCurrentWeight();
 
@@ -69,13 +76,30 @@ public class DailyFragment extends Fragment {
     public void displayCurrentWeight(){
         //set weight value to last value in file
         int currentWeight = storage.getCurrentWeight();
+        boolean isMetric = preferences.getBoolean("units", true);
+        String units = "kg";
+
+        //check if need to convert
+        if(!isMetric){
+            units = "lbs";
+            double weight = (int) currentWeight * 2.2046226218488;
+            currentWeight = (int) weight;
+        }
+
         if(currentWeight >= 1){
-            weightValueTextView.setText(currentWeight + "kg");
+            weightValueTextView.setText(currentWeight + units);
         } else {
             //no weights recorede yet, prompt for weight
             weightDialog.show();
         }
         Log.d("JAMIE", "current weight: " + storage.getCurrentWeight());
+
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        //update weight
+        Log.d("JAMIE","preference changed");
+        displayCurrentWeight();
+    }
 }
