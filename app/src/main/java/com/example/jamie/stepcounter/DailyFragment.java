@@ -109,13 +109,7 @@ public class DailyFragment extends Fragment implements SharedPreferences.OnShare
 
             weightGoalTextView.setText((int)progress + "% of the way to achieving your weight goal!");
             targetWeightTextView.setText("Target weight: " + getFormattedWeight(targetWeight));
-
-            Log.d("JAMIE","________________target: " + targetWeight);
-            Log.d("JAMIE","________________current: " + currentWeight);
-            Log.d("JAMIE","progress3: " + progress);
-
-
-
+            
         } else {
             //no weights recorede yet, prompt for weight
             weightDialog.show();
