@@ -2,6 +2,8 @@ package com.example.jamie.stepcounter;
 
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -86,7 +88,7 @@ public class DailyFragment extends Fragment implements SharedPreferences.OnShare
         int targetWeight = Integer.parseInt(preferences.getString(SettingsActivity.KEY_WEIGHT_GOAL, "50"));
 
         //display target weight
-        weightGoalTextView.setText("Target Weight: " + getFormattedWeight(targetWeight));
+        weightGoalTextView.setText(getFormattedWeight(targetWeight));
 
         if(currentWeight >= 1){
             //display current weight
@@ -103,12 +105,35 @@ public class DailyFragment extends Fragment implements SharedPreferences.OnShare
                 progress = (double)((double)currentWeight/(double)targetWeight ) * 100;
             }
 
+            int color = Color.BLUE;
+
+            if(progress < 25){
+                //red
+                color = Color.rgb(255,10,10);
+            } else if(progress >= 25 && progress < 50) {
+                //yorange
+                color = Color.rgb(255,100,10);
+            } else if(progress >= 50 && progress < 75){
+                //yellow
+                color = Color.rgb(200,200,10);
+            } else if(progress >= 75){
+                //green
+                color = Color.GREEN;
+            }
+
+            Drawable progressDrawable = weightProgressBar.getProgressDrawable().mutate();
+            progressDrawable.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
+            weightProgressBar.setProgressDrawable(progressDrawable);
+
+
+            Log.d("JAMIE","color: " + color);
+
 
             weightProgressBar.setMax(100);
             weightProgressBar.setProgress((int)progress);
 
             weightGoalTextView.setText((int)progress + "% of the way to achieving your weight goal!");
-            targetWeightTextView.setText("Target weight: " + getFormattedWeight(targetWeight));
+            targetWeightTextView.setText(getFormattedWeight(targetWeight));
             
         } else {
             //no weights recorede yet, prompt for weight
