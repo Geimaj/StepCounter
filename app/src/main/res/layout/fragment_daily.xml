@@ -22,26 +22,51 @@
         android:id="@+id/weightLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="0.5"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/weightTextView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/weightHeading" />
 
         <TextView
             android:id="@+id/weightValueTextView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="3"
             android:ems="10"
             android:inputType="textPersonName"
             android:text="50kg" />
 
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/weightTargetLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/targetWeightLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:text="@string/weightTarget" />
+
+        <TextView
+            android:id="@+id/targetWeightTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:text="TextView" />
+
+    </LinearLayout>
+
+
 
     <Button
         android:id="@+id/updateWeightButton"

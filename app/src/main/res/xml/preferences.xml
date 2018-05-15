@@ -30,7 +30,7 @@
             android:dialogTitle="Weight"
             android:dialogMessage="Set goal for weight"
             android:inputType="number"
-            android:key="key_weight"
+            android:key="key_weight_goal"
             android:title="Weight"
             android:summary="Set weight goal">
         </EditTextPreference>
@@ -60,12 +60,6 @@
         </EditTextPreference>
 
     </PreferenceCategory>
-
-    <!--TODO:
-        Age
-        delete all data
-    -->
-
 
 
 </PreferenceScreen>

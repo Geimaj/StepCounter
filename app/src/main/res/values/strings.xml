@@ -23,4 +23,5 @@
         completions."
     </string>
     <string name="title_activity_settings">SettingsActivity</string>
+    <string name="weightTarget">Target Weight:</string>
 </resources>

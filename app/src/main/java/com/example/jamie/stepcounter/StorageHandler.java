@@ -28,6 +28,16 @@ public class StorageHandler {
         weightFile = new File(path, weightFilename);
     }
 
+    public int getKgsLost(){
+        int diff = 0;
+        ArrayList<Integer> weights = getWeights();
+        for (int i = 0; i < weights.size()-2; i++ ) {
+            diff += weights.get(i) - weights.get(i+1);
+        }
+
+        return diff;
+    }
+
     public void saveWeight(String weight){
         try {
             weightFile.getParentFile().mkdirs();
@@ -51,7 +61,6 @@ public class StorageHandler {
             String line;
 
             while ((line = br.readLine()) != null) {
-                Log.d("JAMIE", "LINE: " + line);
                 int weight = Integer.parseInt(line);
                 weightList.add(weight);
             }

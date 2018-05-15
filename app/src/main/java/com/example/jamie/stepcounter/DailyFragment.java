@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
@@ -25,7 +26,10 @@ public class DailyFragment extends Fragment implements SharedPreferences.OnShare
     private StorageChanged storageChangedInterface;
     private UpdateWeightDialog weightDialog;
     private SharedPreferences preferences;
+    private TextView weightGoalTextView;
+    private TextView targetWeightTextView;
 
+    private ProgressBar weightProgressBar;
 
     public DailyFragment() {
         // Required empty public constructor
@@ -55,6 +59,9 @@ public class DailyFragment extends Fragment implements SharedPreferences.OnShare
         //init views
         updateWeightButton = (Button) view.findViewById(R.id.updateWeightButton);
         weightValueTextView = (TextView) view.findViewById(R.id.weightValueTextView);
+        weightGoalTextView = (TextView) view.findViewById(R.id.weightGoalTextView);
+        weightProgressBar = (ProgressBar) view.findViewById(R.id.weightProgressBar);
+        targetWeightTextView = (TextView) view.findViewById(R.id.targetWeightTextView);
 
         //set event listeners
         updateWeightButton.setOnClickListener(new View.OnClickListener() {
@@ -66,7 +73,7 @@ public class DailyFragment extends Fragment implements SharedPreferences.OnShare
                 displayCurrentWeight();
             }
         });
-        
+
         //update weight value
         displayCurrentWeight();
 
@@ -76,18 +83,39 @@ public class DailyFragment extends Fragment implements SharedPreferences.OnShare
     public void displayCurrentWeight(){
         //set weight value to last value in file
         int currentWeight = storage.getCurrentWeight();
-        boolean isMetric = preferences.getBoolean("units", true);
-        String units = "kg";
+        int targetWeight = Integer.parseInt(preferences.getString(SettingsActivity.KEY_WEIGHT_GOAL, "50"));
 
-        //check if need to convert
-        if(!isMetric){
-            units = "lbs";
-            double weight = (int) currentWeight * 2.2046226218488;
-            currentWeight = (int) weight;
-        }
+        //display target weight
+        weightGoalTextView.setText("Target Weight: " + getFormattedWeight(targetWeight));
 
         if(currentWeight >= 1){
-            weightValueTextView.setText(currentWeight + units);
+            //display current weight
+            weightValueTextView.setText(getFormattedWeight(currentWeight));
+
+            double progress;
+
+            //update progress bar
+            if(currentWeight > targetWeight){
+                //loose weight
+                progress = (double)((double)targetWeight / (double)currentWeight) * 100;
+            } else {
+                //gain weight
+                progress = (double)((double)currentWeight/(double)targetWeight ) * 100;
+            }
+
+
+            weightProgressBar.setMax(100);
+            weightProgressBar.setProgress((int)progress);
+
+            weightGoalTextView.setText((int)progress + "% of the way to achieving your weight goal!");
+            targetWeightTextView.setText("Target weight: " + getFormattedWeight(targetWeight));
+
+            Log.d("JAMIE","________________target: " + targetWeight);
+            Log.d("JAMIE","________________current: " + currentWeight);
+            Log.d("JAMIE","progress3: " + progress);
+
+
+
         } else {
             //no weights recorede yet, prompt for weight
             weightDialog.show();
@@ -102,4 +130,18 @@ public class DailyFragment extends Fragment implements SharedPreferences.OnShare
         Log.d("JAMIE","preference changed");
         displayCurrentWeight();
     }
+
+    public String getFormattedWeight(int kgs){
+        boolean isMetric = preferences.getBoolean(SettingsActivity.KEY_UNITS, true);
+        String units = "kg";
+
+        if(!isMetric){
+            units = "lbs";
+            double weight = (int) kgs * 2.2046226218488;
+            kgs = (int) weight;
+        }
+
+        return kgs + " " + units;
+    }
+
 }
