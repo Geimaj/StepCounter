@@ -19,6 +19,9 @@ public class MainActivity extends AppCompatActivity {
     private SectionsPageAdapter sectionsPageAdapter;
     private LoginActivity loginActivity;
 
+    public static String DEBUG_TAG = "pitime";
+
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);

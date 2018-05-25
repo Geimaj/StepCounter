@@ -8,15 +8,45 @@
     tools:context=".DailyFragment">
 
     <!-- TODO: Update blank fragment layout -->
+
     <TextView
-        android:id="@+id/dailyHeadingTextView"
+        android:id="@+id/stepCountTextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1"
+        android:layout_weight="0.5"
         android:gravity="center_horizontal"
-        android:text="@string/dailyHeading"
-        android:textSize="@dimen/headingSize" />
+        android:text="1337 Steps" />
+
+    <ProgressBar
+        android:id="@+id/stepCountProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/stepPercentageTextView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:gravity="center_horizontal"
+        android:text="50% of daily steps goal" />
+
+
+    <ProgressBar
+        android:id="@+id/weightProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/weightGoalTextView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:gravity="center_horizontal"
+        android:text="50% of weight goal" />
 
     <LinearLayout
         android:id="@+id/weightLinearLayout"
@@ -66,51 +96,11 @@
 
     </LinearLayout>
 
-
-
     <Button
         android:id="@+id/updateWeightButton"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:text="@string/updateWeightButton" />
-
-    <TextView
-        android:id="@+id/stepCountTextView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.5"
-        android:gravity="center_horizontal"
-        android:text="1337 Steps" />
-
-    <ProgressBar
-        android:id="@+id/stepCountProgressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <TextView
-        android:id="@+id/stepPercentageTextView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.5"
-        android:gravity="center_horizontal"
-        android:text="50% of daily steps goal" />
-
-    <ProgressBar
-        android:id="@+id/weightProgressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <TextView
-        android:id="@+id/weightGoalTextView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.5"
-        android:gravity="center_horizontal"
-        android:text="50% of weight goal" />
 
 </LinearLayout>

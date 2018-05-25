@@ -4,6 +4,10 @@ package com.example.jamie.stepcounter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -15,21 +19,29 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import static android.content.Context.SENSOR_SERVICE;
+
 
 /**
  * A simple {@link Fragment} subclass.s
  */
-public class DailyFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener{
+public class DailyFragment extends Fragment
+        implements SharedPreferences.OnSharedPreferenceChangeListener, StepListener, SensorEventListener, StorageChanged{
 
     private Button updateWeightButton;
 //    private View.OnClickListener updateWeightHandler;
     private TextView weightValueTextView;
+    private TextView stepsTextView;
     private StorageHandler storage;
     private StorageChanged storageChangedInterface;
     private UpdateWeightDialog weightDialog;
     private SharedPreferences preferences;
     private TextView weightGoalTextView;
     private TextView targetWeightTextView;
+    private SensorManager sensorManager;
+    private Sensor accel;
+    private StepDetector simpleStepDetector;
+    private int numSteps;
 
     private ProgressBar weightProgressBar;
 
@@ -48,15 +60,19 @@ public class DailyFragment extends Fragment implements SharedPreferences.OnShare
 
         storage = new StorageHandler(getContext());
 
-        storageChangedInterface = new StorageChanged() {
-            @Override
-            public void weightChanged() {
-                displayCurrentWeight();
-            }
-        };
+        //setup sensors
+        sensorManager = (SensorManager) getActivity().getSystemService(SENSOR_SERVICE);
+        accel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        simpleStepDetector = new StepDetector();
+        simpleStepDetector.registerListener(this);
 
+
+        //register step listener
+        sensorManager.registerListener(this, accel, SensorManager.SENSOR_DELAY_FASTEST);
+
+        //init weight dialog
         weightDialog = new UpdateWeightDialog(getActivity());
-        weightDialog.setInterface(storageChangedInterface);
+        weightDialog.registerListener(this);
 
         //init views
         updateWeightButton = (Button) view.findViewById(R.id.updateWeightButton);
@@ -64,6 +80,7 @@ public class DailyFragment extends Fragment implements SharedPreferences.OnShare
         weightGoalTextView = (TextView) view.findViewById(R.id.weightGoalTextView);
         weightProgressBar = (ProgressBar) view.findViewById(R.id.weightProgressBar);
         targetWeightTextView = (TextView) view.findViewById(R.id.targetWeightTextView);
+        stepsTextView = (TextView) view.findViewById(R.id.stepCountTextView);
 
         //set event listeners
         updateWeightButton.setOnClickListener(new View.OnClickListener() {
@@ -79,13 +96,24 @@ public class DailyFragment extends Fragment implements SharedPreferences.OnShare
         //update weight value
         displayCurrentWeight();
 
+
+        numSteps = 0;
+        updateStepsView(numSteps);
+
         return view;
     }
+
+    private void updateStepsView(int steps){
+        stepsTextView.setText(steps + " taken");
+    }
+
 
     public void displayCurrentWeight(){
         //set weight value to last value in file
         int currentWeight = storage.getCurrentWeight();
         int targetWeight = Integer.parseInt(preferences.getString(SettingsActivity.KEY_WEIGHT_GOAL, "50"));
+
+        Log.d(MainActivity.DEBUG_TAG, "target weight: " + targetWeight);
 
         //display target weight
         weightGoalTextView.setText(getFormattedWeight(targetWeight));
@@ -125,10 +153,6 @@ public class DailyFragment extends Fragment implements SharedPreferences.OnShare
             progressDrawable.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
             weightProgressBar.setProgressDrawable(progressDrawable);
 
-
-            Log.d("JAMIE","color: " + color);
-
-
             weightProgressBar.setMax(100);
             weightProgressBar.setProgress((int)progress);
 
@@ -139,14 +163,11 @@ public class DailyFragment extends Fragment implements SharedPreferences.OnShare
             //no weights recorede yet, prompt for weight
             weightDialog.show();
         }
-        Log.d("JAMIE", "current weight: " + storage.getCurrentWeight());
-
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         //update weight
-        Log.d("JAMIE","preference changed");
         displayCurrentWeight();
     }
 
@@ -163,4 +184,33 @@ public class DailyFragment extends Fragment implements SharedPreferences.OnShare
         return kgs + " " + units;
     }
 
+    @Override
+    public void step(long timeNs) {
+        numSteps++;
+        Log.d(MainActivity.DEBUG_TAG,"step taken! " + numSteps);
+        updateStepsView(numSteps);
+
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            simpleStepDetector.updateAccel(
+                    event.timestamp, event.values[0], event.values[1], event.values[2]);
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    @Override
+    public void weightChanged() {
+        displayCurrentWeight();
+        Log.d(MainActivity.DEBUG_TAG, "WEIGHT CHANGED");
+
+
+
+    }
 }

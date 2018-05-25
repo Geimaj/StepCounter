@@ -28,6 +28,7 @@ public class UpdateWeightDialog extends Dialog {
     private TextView errorMessageTextView;
     private Activity actvity;
     private StorageChanged storageChangedInterface;
+    private StorageHandler sh;
 //    OnDia
 
     public UpdateWeightDialog(Activity a) {
@@ -45,6 +46,8 @@ public class UpdateWeightDialog extends Dialog {
         cancelButton = (Button) findViewById(R.id.cancelWeightButton);
         weightInput = (TextInputEditText)findViewById(R.id.weightInput);
         errorMessageTextView = (TextView) findViewById(R.id.errorMessageTextView);
+
+        sh = new StorageHandler(getContext());
 
         //hide error message by default
         errorMessageTextView.setVisibility(View.GONE);
@@ -84,8 +87,7 @@ public class UpdateWeightDialog extends Dialog {
                 //check valid weight
                 if(validWeight(weight)){
                     //apped weight to file
-                    StorageHandler sh = new StorageHandler(getContext());
-                    sh.saveWeight(weight);
+                    sh.logWeight(weight);
 
                     //callback
                     storageChangedInterface.weightChanged();
@@ -107,7 +109,7 @@ public class UpdateWeightDialog extends Dialog {
 
     }
 
-    public void setInterface(StorageChanged sc){
+    public void registerListener(StorageChanged sc){
         this.storageChangedInterface = sc;
     }
 

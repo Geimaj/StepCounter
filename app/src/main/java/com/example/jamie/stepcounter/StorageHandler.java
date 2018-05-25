@@ -13,7 +13,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class StorageHandler {
 
@@ -26,24 +28,20 @@ public class StorageHandler {
         this.ctx = ctx;
         path = ctx.getFilesDir();
         weightFile = new File(path, weightFilename);
+
+//        weightFile.getParentFile().mkdirs();
+
     }
 
-    public int getKgsLost(){
-        int diff = 0;
-        ArrayList<Integer> weights = getWeights();
-        for (int i = 0; i < weights.size()-2; i++ ) {
-            diff += weights.get(i) - weights.get(i+1);
-        }
-
-        return diff;
-    }
-
-    public void saveWeight(String weight){
+    public void logWeight(String weight){
         try {
             weightFile.getParentFile().mkdirs();
             FileOutputStream fos = new FileOutputStream(weightFile, true);
+
+            LogDate ld = new LogDate(weight);
+            String line = ld.toString();
             //add data
-            fos.write(weight.getBytes());
+            fos.write(line.getBytes());
             //add new line
             fos.write("\n".getBytes());
             fos.close();
@@ -53,25 +51,34 @@ public class StorageHandler {
         }
     }
 
-    public ArrayList<Integer> getWeights() {
-        ArrayList<Integer>weightList = new ArrayList<>();
+    public ArrayList<LogDate> getWeights() {
+        ArrayList<LogDate>weightList = new ArrayList<>();
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(weightFile));
             String line;
 
             while ((line = br.readLine()) != null) {
-                int weight = Integer.parseInt(line);
-                weightList.add(weight);
+                String[] tokens = line.split(",");
+                int weight = Integer.parseInt(tokens[0]);
+                String date = (tokens[1]);
+                LogDate ld = new LogDate(weight,date);
+                weightList.add(ld);
+
+                Log.d(MainActivity.DEBUG_TAG, ld.toString());
             }
             br.close();
+            Log.d(MainActivity.DEBUG_TAG, "file over");
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (NumberFormatException e){
-            Log.d("JAMIE","CANT CONVERT");
+            Log.d(MainActivity.DEBUG_TAG,"CANT CONVERT DATA FROM WEIGHT FILE TO INT");
+            e.printStackTrace();
+        } catch(ArrayIndexOutOfBoundsException e){
+            Log.d(MainActivity.DEBUG_TAG,"No dates in file...");
             e.printStackTrace();
         }
 
@@ -79,9 +86,9 @@ public class StorageHandler {
     }
 
     public int getCurrentWeight(){
-        ArrayList<Integer> weights = getWeights();
+        ArrayList<LogDate> weights = getWeights();
         if(weights.size() >= 1){
-            return weights.get(weights.size()-1);
+            return weights.get(weights.size()-1).getWeight();
         } else {
             return -1; //no weights yet
         }
