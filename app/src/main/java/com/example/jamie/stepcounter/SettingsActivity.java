@@ -47,7 +47,7 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
         if(key == KEY_WEIGHT_GOAL){
             //make sure weight goal is less than current weight
             int weightGoal = prefs.getInt(KEY_WEIGHT_GOAL, 50);
-            int currentWeight = storage.getCurrentWeight();
+            double currentWeight = storage.getCurrentWeight();
         }
 
     }

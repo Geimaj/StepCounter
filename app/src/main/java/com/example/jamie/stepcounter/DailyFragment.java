@@ -110,17 +110,18 @@ public class DailyFragment extends Fragment
 
     public void displayCurrentWeight(){
         //set weight value to last value in file
-        int currentWeight = storage.getCurrentWeight();
+        double currentWeight = storage.getCurrentWeight();
         int targetWeight = Integer.parseInt(preferences.getString(SettingsActivity.KEY_WEIGHT_GOAL, "50"));
+        boolean isMetric = preferences.getBoolean(SettingsActivity.KEY_UNITS, true);
 
         Log.d(MainActivity.DEBUG_TAG, "target weight: " + targetWeight);
 
         //display target weight
-        weightGoalTextView.setText(getFormattedWeight(targetWeight));
+        weightGoalTextView.setText(LogDate.getFormattedWeight(targetWeight, isMetric));
 
         if(currentWeight >= 1){
             //display current weight
-            weightValueTextView.setText(getFormattedWeight(currentWeight));
+            weightValueTextView.setText(LogDate.getFormattedWeight(currentWeight, isMetric));
 
             double progress;
 
@@ -157,7 +158,7 @@ public class DailyFragment extends Fragment
             weightProgressBar.setProgress((int)progress);
 
             weightGoalTextView.setText((int)progress + "% of the way to achieving your weight goal!");
-            targetWeightTextView.setText(getFormattedWeight(targetWeight));
+            targetWeightTextView.setText(LogDate.getFormattedWeight(targetWeight, isMetric));
             
         } else {
             //no weights recorede yet, prompt for weight
@@ -171,18 +172,18 @@ public class DailyFragment extends Fragment
         displayCurrentWeight();
     }
 
-    public String getFormattedWeight(int kgs){
-        boolean isMetric = preferences.getBoolean(SettingsActivity.KEY_UNITS, true);
-        String units = "kg";
-
-        if(!isMetric){
-            units = "lbs";
-            double weight = (int) kgs * 2.2046226218488;
-            kgs = (int) weight;
-        }
-
-        return kgs + " " + units;
-    }
+//    public String getFormattedWeight(int kgs){
+//        boolean isMetric = preferences.getBoolean(SettingsActivity.KEY_UNITS, true);
+//        String units = "kg";
+//
+//        if(!isMetric){
+//            units = "lbs";
+//            double weight = (int) kgs * 2.2046226218488;
+//            kgs = (int) weight;
+//        }
+//
+//        return kgs + " " + units;
+//    }
 
     @Override
     public void step(long timeNs) {
@@ -209,8 +210,6 @@ public class DailyFragment extends Fragment
     public void weightChanged() {
         displayCurrentWeight();
         Log.d(MainActivity.DEBUG_TAG, "WEIGHT CHANGED");
-
-
 
     }
 }

@@ -9,7 +9,7 @@ import java.util.Date;
 
 public class LogDate {
 
-    private int weight;
+    private double kgs;
     private Date date;
     public static final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -17,27 +17,39 @@ public class LogDate {
 
     }
     public LogDate(String weight){
-        this.weight = Integer.parseInt(weight);
+        this.kgs = Double.parseDouble(weight);
         this.date = new Date();
     }
 
-    public LogDate(int weight){
-        this.weight = weight;
+    public LogDate(String weight, boolean isMetric){
+        this.kgs = Double.parseDouble(weight);
         this.date = new Date();
+
+        if(!isMetric){this.kgs = getKgs(this.kgs);}
+
     }
 
-    public LogDate(int weight, Date date){
-        this.weight = weight;
+    public LogDate(double weight, boolean isMetric){
+        this.kgs = weight;
+        this.date = new Date();
+
+        if(!isMetric){this.kgs = getKgs(weight);}
+
+    }
+
+    public LogDate(double weight, Date date){
+        this.kgs = weight;
         this.date = date;
+
     }
 
-    public LogDate(int weight, String date){
-        this.weight = weight;
+    public LogDate(double weight, String date){
+        this.kgs = weight;
         try {
             this.date = dateFormat.parse(date);
         } catch (ParseException e) {
-            e.printStackTrace();
             Log.d("JAMIE","Invalid date");
+            e.printStackTrace();
         }
     }
 
@@ -49,16 +61,46 @@ public class LogDate {
         this.date = date;
     }
 
-    public int getWeight() {
-        return weight;
+    public double getWeight() {
+        return kgs;
     }
 
     public void setWeight(int weight) {
-        this.weight = weight;
+        this.kgs = weight;
     }
 
     @Override
     public String toString() {
-        return weight + "," + dateFormat.format(date);
+        return kgs + "," + dateFormat.format(date);
     }
+
+    public double getKgs() {
+        return kgs;
+    }
+
+    public double getKgs(double lbs) {
+        return lbs / 2.2046226218488;
+    }
+
+    public double getLbs() {
+        return kgs * 2.2046226218488;
+    }
+
+    public static double getLbs(double pKgs) {
+        return pKgs * 2.2046226218488;
+    }
+
+    public static String getFormattedWeight(double kgs, boolean isMetric){
+        String units = "kg";
+        double weight = kgs;
+
+        if(!isMetric){
+            units = "lbs";
+            weight = getLbs(kgs);
+        }
+
+        return weight + " " + units;
+    }
+
+
 }

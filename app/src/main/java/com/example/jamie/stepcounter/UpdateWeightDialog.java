@@ -3,8 +3,10 @@ package com.example.jamie.stepcounter;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TextInputEditText;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -86,8 +88,10 @@ public class UpdateWeightDialog extends Dialog {
                 String weight = weightInput.getText().toString();
                 //check valid weight
                 if(validWeight(weight)){
+                    boolean isMetric = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(SettingsActivity.KEY_UNITS, true);
+
                     //apped weight to file
-                    sh.logWeight(weight);
+                    sh.logWeight(weight, isMetric);
 
                     //callback
                     storageChangedInterface.weightChanged();
