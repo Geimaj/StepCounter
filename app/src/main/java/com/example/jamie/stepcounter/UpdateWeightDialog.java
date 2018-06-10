@@ -22,15 +22,19 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 
-public class UpdateWeightDialog extends Dialog {
+public class UpdateWeightDialog extends Dialog implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     private Button confirmWeightButton;
     private Button cancelButton;
     private TextInputEditText weightInput;
     private TextView errorMessageTextView;
+    private TextView weightPromptTextView;
     private Activity actvity;
     private StorageChanged storageChangedInterface;
     private StorageHandler sh;
+    private SharedPreferences preferences;
+    private String units;
+    private String prompt;
 //    OnDia
 
     public UpdateWeightDialog(Activity a) {
@@ -48,8 +52,15 @@ public class UpdateWeightDialog extends Dialog {
         cancelButton = (Button) findViewById(R.id.cancelWeightButton);
         weightInput = (TextInputEditText)findViewById(R.id.weightInput);
         errorMessageTextView = (TextView) findViewById(R.id.errorMessageTextView);
-
+        weightPromptTextView = (TextView) findViewById(R.id.weightPromptTextView);
         sh = new StorageHandler(getContext());
+        preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        preferences.registerOnSharedPreferenceChangeListener(this);
+
+        prompt = "Enter your weight in";
+
+        //set unit label
+        updateUnitLabel();
 
         //hide error message by default
         errorMessageTextView.setVisibility(View.GONE);
@@ -133,5 +144,24 @@ public class UpdateWeightDialog extends Dialog {
         return result;
     }
 
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        updateUnitLabel();
+        Log.d(MainActivity.DEBUG_TAG, "update units");
+    }
+
+    private void updateUnitLabel(){
+        String unitPrompt;
+
+        if(preferences.getBoolean(SettingsActivity.KEY_UNITS, true)){
+            units = "kg";
+        } else {
+            units = "lbs";
+        }
+
+        unitPrompt = prompt + " " + units + ":";
+        weightPromptTextView.setText(unitPrompt);
+    }
 
 }

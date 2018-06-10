@@ -32,10 +32,10 @@ public class DailyFragment extends Fragment
 //    private View.OnClickListener updateWeightHandler;
     private TextView weightValueTextView;
     private TextView stepsTextView;
-    private StorageHandler storage;
+    public static  StorageHandler storage;
     private StorageChanged storageChangedInterface;
     private UpdateWeightDialog weightDialog;
-    private SharedPreferences preferences;
+    public static SharedPreferences preferences;
     private TextView weightGoalTextView;
     private TextView targetWeightTextView;
     private SensorManager sensorManager;
@@ -171,19 +171,6 @@ public class DailyFragment extends Fragment
         //update weight
         displayCurrentWeight();
     }
-
-//    public String getFormattedWeight(int kgs){
-//        boolean isMetric = preferences.getBoolean(SettingsActivity.KEY_UNITS, true);
-//        String units = "kg";
-//
-//        if(!isMetric){
-//            units = "lbs";
-//            double weight = (int) kgs * 2.2046226218488;
-//            kgs = (int) weight;
-//        }
-//
-//        return kgs + " " + units;
-//    }
 
     @Override
     public void step(long timeNs) {

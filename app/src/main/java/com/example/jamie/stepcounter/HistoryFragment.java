@@ -1,6 +1,8 @@
 package com.example.jamie.stepcounter;
 
 
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -9,14 +11,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.LimitLine;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
+import java.text.DateFormatSymbols;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -25,7 +36,7 @@ import java.util.Date;
 public class HistoryFragment extends Fragment {
 
     private StorageHandler storageHandler;
-    private GraphView graph;
+    private LineChart graph;
     private Button refreshGraphButton;
 
 
@@ -40,10 +51,12 @@ public class HistoryFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view =  inflater.inflate(R.layout.fragment_history, container, false);
-        storageHandler = new StorageHandler(getContext());
-        graph = (GraphView) view.findViewById(R.id.graph);
 
-        drawGraph();
+        storageHandler = DailyFragment.storage;//new StorageHandler(getContext());
+
+        graph = (LineChart) view.findViewById(R.id.graph);
+
+//        drawGraph();
 
         refreshGraphButton = (Button) view.findViewById(R.id.refreshGraphButton);
 
@@ -63,45 +76,103 @@ public class HistoryFragment extends Fragment {
     };
 
     private void drawGraph(){
-        ArrayList<LogDate> logWeights = storageHandler.getWeights();
+        graph.clear();
+        final ArrayList<LogDate> logWeights = storageHandler.getWeights();
+        List<Entry> entries = new ArrayList<Entry>();
+        List<Entry> heightEntries = new ArrayList<Entry>();
 
-//        //adddata points
-//        DataPoint[] dp = new DataPoint[logWeights.size()];
-//        Log.d(MainActivity.DEBUG_TAG, "---------------------len: " + dp.length);
-//
-//        for (int i = 0; i < dp.length; i++){
-//            LogDate logDate = logWeights.get(i);
-//            dp[i] = (new DataPoint(new Date(i), logDate.getWeight()));
-//            Log.d(MainActivity.DEBUG_TAG, "graphing weight: " + logDate.getWeight());
-//        }
-//
-//        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(dp);
-//
-//        graph.addSeries(series);
-//
-//        Log.d(MainActivity.DEBUG_TAG,"numdatapoints: " + dp.length);
-//
-//        if(dp.length > 0){
-//
-//            // set date label formatter
-//            graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity()));
-//            graph.getGridLabelRenderer().setNumHorizontalLabels(4); // only 4 because of the space
-//
-//            // set manual x bounds to have nice steps
-//            graph.getViewport().setMinX(logWeights.get(0).getDate().getTime());
-//            graph.getViewport().setMaxX(logWeights.get(logWeights.size()-1).getDate().getTime());
-//            graph.getViewport().setXAxisBoundsManual(true);
-//
-//            // as we use dates as labels, the human rounding to nice readable numbers
-//            // is not necessary
-//            graph.getGridLabelRenderer().setHumanRounding(false);
-//
-//        }
+        //create entries (actual data)
+        int i = 0;
+        for(LogDate d : logWeights){
+            Log.d(MainActivity.DEBUG_TAG, "I: " + i);
+            entries.add(new Entry((float) i, (float) d.getKgs()));
+            i++;
+        }
 
+        //add height entries
+        
 
-//        graph.
+        //add entries to dataset
+        LineDataSet dataSet = new LineDataSet(entries, "Weight");
+        dataSet.setColor(Color.BLUE);
+        dataSet.setValueTextColor(Color.BLUE);
+        dataSet.setValueTextSize(12f);
+        dataSet.setLineWidth(4f);
+        dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 
+        //add target weight line
+        int targetWeight = Integer.parseInt(DailyFragment.preferences.getString(SettingsActivity.KEY_WEIGHT_GOAL, "50"));
+        LimitLine weightGoalLine = new LimitLine((float) targetWeight, "Target Weight");
+        weightGoalLine.setLineColor(Color.RED);
+        weightGoalLine.setLineWidth(2f);
+        weightGoalLine.setTextColor(Color.BLACK);
+        weightGoalLine.setTextSize(12f);
+
+        //add datasets to LineData
+        LineData data = new LineData(dataSet);
+        //set data
+        graph.setData(data);
+
+        //format data
+
+        IAxisValueFormatter formatter = new IAxisValueFormatter() {
+
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM");
+                int index = (int) value;
+                Date target;
+
+                Log.d(MainActivity.DEBUG_TAG, "INDEX: " + index);
+
+                if(index < 0){
+                    //return day before logweights[0]
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(logWeights.get(0).getDate());
+                    cal.add(Calendar.DATE, -1);
+                    target = cal.getTime();
+                } else if(index >= logWeights.size()-1){
+                    //return day after logweights[size]
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(logWeights.get(logWeights.size()-1).getDate());
+                    cal.add(Calendar.DATE, 1);
+                    target = cal.getTime();
+                } else {
+                    //return formatted date
+                    target = logWeights.get(index).getDate();
+                }
+                String result = formatter.format(target);
+                Log.d(MainActivity.DEBUG_TAG, "RESULT: " + result);
+                return formatter.format(target);
+//                return new DateFormatSymbols().getMonths()[(int)value];
+            }
+
+        };
+
+        //format x axis labels
+        XAxis xAxis = graph.getXAxis();
+        xAxis.setGranularity(1f);
+        xAxis.setValueFormatter(formatter);
+        xAxis.setTextSize(14f);
+
+        YAxis y = graph.getAxisLeft();
+        y.setTextSize(14f);
+        y.setAxisMinimum(20f);
+        y.setAxisMaximum(100f);
+
+        //add target weight
+        y.addLimitLine(weightGoalLine);
+
+        YAxis right = graph.getAxisRight();
+        right.setDrawAxisLine(false);
+        right.setDrawAxisLine(false);
+        right.setDrawGridLines(false);
+        right.setEnabled(false);
+
+        //refresh
+        graph.invalidate();
     }
 
 
 }
+
