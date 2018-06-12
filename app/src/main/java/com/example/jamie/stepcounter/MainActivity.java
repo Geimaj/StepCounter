@@ -30,7 +30,8 @@ public class MainActivity extends AppCompatActivity {
         //display login
         loginActivity = new LoginActivity();
         Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
+//        TODO: uncomment this line to enable login!
+        //        startActivity(intent);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

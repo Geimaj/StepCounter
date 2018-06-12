@@ -1,7 +1,6 @@
 package com.example.jamie.stepcounter;
 
 
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,9 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -21,8 +22,6 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
-import java.text.DateFormatSymbols;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,8 +36,10 @@ public class HistoryFragment extends Fragment {
 
     private StorageHandler storageHandler;
     private LineChart graph;
-    private Button refreshGraphButton;
-
+    private Button drawWeightButton;
+    private Button drawStepsButton;
+    private TextView dateTextView;
+    private TextView unitTextView;
 
 
     public HistoryFragment() {
@@ -55,42 +56,92 @@ public class HistoryFragment extends Fragment {
         storageHandler = DailyFragment.storage;//new StorageHandler(getContext());
 
         graph = (LineChart) view.findViewById(R.id.graph);
+        dateTextView = (TextView) view.findViewById(R.id.dateTextView);
+        unitTextView = (TextView) view.findViewById(R.id.unitTextView);
+        drawWeightButton = (Button) view.findViewById(R.id.refreshGraphButton);
+        drawWeightButton.setOnClickListener(refreshGraphListener);
+        drawStepsButton = (Button) view.findViewById(R.id.drawStepsButton);
+        drawStepsButton.setOnClickListener(drawStepsListener);
 
-//        drawGraph();
-
-        refreshGraphButton = (Button) view.findViewById(R.id.refreshGraphButton);
-
-        refreshGraphButton.setOnClickListener(refreshGraphListener);
-
+        //hide axes labels by default
+        dateTextView.setVisibility(View.GONE);
+        unitTextView.setVisibility(View.GONE);
 
 
         // Inflate the layout for this fragment
         return view;
     }
 
-    private View.OnClickListener refreshGraphListener = new View.OnClickListener() {
+
+    private View.OnClickListener drawStepsListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            drawGraph();
+            drawStepsGraph();
         }
     };
 
-    private void drawGraph(){
+    private View.OnClickListener refreshGraphListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            drawWeightGraph();
+        }
+    };
+
+    private void drawStepsGraph(){
+        dateTextView.setVisibility(View.VISIBLE);
+        unitTextView.setVisibility(View.VISIBLE);
+        unitTextView.setText("Steps");
+
+        graph.clear();
+
+        graph.invalidate();
+
+    }
+
+    private void drawWeightGraph(){
+        dateTextView.setVisibility(View.VISIBLE);
+        unitTextView.setVisibility(View.VISIBLE);
+
         graph.clear();
         final ArrayList<LogDate> logWeights = storageHandler.getWeights();
         List<Entry> entries = new ArrayList<Entry>();
         List<Entry> heightEntries = new ArrayList<Entry>();
+        double minWeight = Double.MAX_VALUE;
+        double maxWeight = Double.MIN_VALUE;
+        int targetWeight = Integer.parseInt(DailyFragment.preferences.getString(SettingsActivity.KEY_WEIGHT_GOAL, "50"));
 
         //create entries (actual data)
         int i = 0;
         for(LogDate d : logWeights){
-            Log.d(MainActivity.DEBUG_TAG, "I: " + i);
-            entries.add(new Entry((float) i, (float) d.getKgs()));
+            if(DailyFragment.isMetric) {
+                entries.add(new Entry((float) i, (float) d.getKgs()));
+            } else {
+                entries.add(new Entry((float) i, (float) d.getLbs()));
+            }
+            if(d.getKgs() > maxWeight){
+                maxWeight = d.getKgs();
+            }
+            if(d.getKgs() < minWeight){
+                minWeight = d.getKgs();
+            }
             i++;
+        }
+        //find min between goal and min weight
+        float min = (float) Math.min(minWeight,targetWeight) - 10;
+        float max = (float) Math.max(targetWeight, maxWeight) + 10;
+
+        if(!DailyFragment.isMetric){
+            min *= 2.2;
+            max *= 2.2;
+            targetWeight *= 2.2;
+            unitTextView.setText("LBS");
+        } else {
+            unitTextView.setText("KG");
+
         }
 
         //add height entries
-        
+
 
         //add entries to dataset
         LineDataSet dataSet = new LineDataSet(entries, "Weight");
@@ -101,12 +152,13 @@ public class HistoryFragment extends Fragment {
         dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 
         //add target weight line
-        int targetWeight = Integer.parseInt(DailyFragment.preferences.getString(SettingsActivity.KEY_WEIGHT_GOAL, "50"));
         LimitLine weightGoalLine = new LimitLine((float) targetWeight, "Target Weight");
         weightGoalLine.setLineColor(Color.RED);
         weightGoalLine.setLineWidth(2f);
         weightGoalLine.setTextColor(Color.BLACK);
         weightGoalLine.setTextSize(12f);
+
+//        dataSet.setColors(ColorTemplate.COLORFUL_COLORS);
 
         //add datasets to LineData
         LineData data = new LineData(dataSet);
@@ -154,13 +206,15 @@ public class HistoryFragment extends Fragment {
         xAxis.setGranularity(1f);
         xAxis.setValueFormatter(formatter);
         xAxis.setTextSize(14f);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 
         YAxis y = graph.getAxisLeft();
         y.setTextSize(14f);
-        y.setAxisMinimum(20f);
-        y.setAxisMaximum(100f);
-
+        //set range
+        y.setAxisMinimum(min);
+        y.setAxisMaximum(max);
         //add target weight
+        y.removeAllLimitLines();
         y.addLimitLine(weightGoalLine);
 
         YAxis right = graph.getAxisRight();
@@ -168,7 +222,12 @@ public class HistoryFragment extends Fragment {
         right.setDrawAxisLine(false);
         right.setDrawGridLines(false);
         right.setEnabled(false);
+        Description desc = new Description();
+        desc.setText("Weight activity");
 
+
+//        graph.setDes
+        graph.setDescription(desc);
         //refresh
         graph.invalidate();
     }

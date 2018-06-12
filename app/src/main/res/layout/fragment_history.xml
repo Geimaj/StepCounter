@@ -7,18 +7,63 @@
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/graph"
-        android:layout_width="match_parent"
-        android:layout_height="324dp"
-        android:layout_above="@+id/refreshGraphButton"
-        android:layout_alignParentStart="true" />
+        android:layout_width="332dp"
+        android:layout_height="410dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="38dp"
+        android:layout_marginTop="0dp"
+        android:paddingTop="5dp" />
 
-    <Button
-        android:id="@+id/refreshGraphButton"
+    <TextView
+        android:id="@+id/unitTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="62dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="184dp"
+        android:rotation="90"
+        android:text="KG"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/dateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/graph"
+        android:layout_centerHorizontal="true"
+        android:text="Date"
+        android:textSize="24sp" />
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="176dp"
-        android:text="refresh" />
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="19dp"
+        android:layout_marginStart="66dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/drawStepsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/refreshGraphButton"
+            android:layout_toEndOf="@+id/dateTextView"
+            android:layout_weight="1"
+            android:text="Draw Steps"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/refreshGraphButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="20dp"
+            android:layout_toStartOf="@+id/dateTextView"
+            android:layout_weight="1"
+            android:text="Draw Weight" />
+    </LinearLayout>
 
 </RelativeLayout>

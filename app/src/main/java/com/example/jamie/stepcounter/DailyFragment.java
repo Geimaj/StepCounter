@@ -42,6 +42,7 @@ public class DailyFragment extends Fragment
     private Sensor accel;
     private StepDetector simpleStepDetector;
     private int numSteps;
+    public static boolean isMetric;
 
     private ProgressBar weightProgressBar;
 
@@ -112,7 +113,7 @@ public class DailyFragment extends Fragment
         //set weight value to last value in file
         double currentWeight = storage.getCurrentWeight();
         int targetWeight = Integer.parseInt(preferences.getString(SettingsActivity.KEY_WEIGHT_GOAL, "50"));
-        boolean isMetric = preferences.getBoolean(SettingsActivity.KEY_UNITS, true);
+        isMetric = preferences.getBoolean(SettingsActivity.KEY_UNITS, true);
 
         Log.d(MainActivity.DEBUG_TAG, "target weight: " + targetWeight);
 

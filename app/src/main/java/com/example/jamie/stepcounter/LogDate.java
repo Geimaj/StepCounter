@@ -99,7 +99,7 @@ public class LogDate {
             weight = getLbs(kgs);
         }
 
-        return weight + " " + units;
+        return Math.round(weight) + " " + units;
     }
 
 
