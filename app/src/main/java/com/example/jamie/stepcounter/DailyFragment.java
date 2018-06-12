@@ -32,12 +32,13 @@ public class DailyFragment extends Fragment
 //    private View.OnClickListener updateWeightHandler;
     private TextView weightValueTextView;
     private TextView stepsTextView;
-    public static  StorageHandler storage;
+    public  StorageHandler storage;
     private StorageChanged storageChangedInterface;
     private UpdateWeightDialog weightDialog;
     public static SharedPreferences preferences;
     private TextView weightGoalTextView;
     private TextView targetWeightTextView;
+    private TextView stepPercentageTextView;
     private SensorManager sensorManager;
     private Sensor accel;
     private StepDetector simpleStepDetector;
@@ -45,6 +46,7 @@ public class DailyFragment extends Fragment
     public static boolean isMetric;
 
     private ProgressBar weightProgressBar;
+    private ProgressBar stepProgressBar;
 
     public DailyFragment() {
         // Required empty public constructor
@@ -80,8 +82,10 @@ public class DailyFragment extends Fragment
         weightValueTextView = (TextView) view.findViewById(R.id.weightValueTextView);
         weightGoalTextView = (TextView) view.findViewById(R.id.weightGoalTextView);
         weightProgressBar = (ProgressBar) view.findViewById(R.id.weightProgressBar);
+        stepProgressBar = (ProgressBar) view.findViewById(R.id.stepCountProgressBar);
         targetWeightTextView = (TextView) view.findViewById(R.id.targetWeightTextView);
         stepsTextView = (TextView) view.findViewById(R.id.stepCountTextView);
+        stepPercentageTextView = (TextView) view.findViewById(R.id.stepPercentageTextView);
 
         //set event listeners
         updateWeightButton.setOnClickListener(new View.OnClickListener() {
@@ -98,14 +102,57 @@ public class DailyFragment extends Fragment
         displayCurrentWeight();
 
 
-        numSteps = 0;
+        numSteps = storage.getStepsToday();
         updateStepsView(numSteps);
 
         return view;
     }
 
+    private int updateProgressBar(int current, int goal, ProgressBar bar){
+        double progress;
+
+        //update progress bar
+        if(current > goal){
+            //loose weight
+            progress = (double)((double)goal / (double)current) * 100;
+        } else {
+            //gain weight
+            progress = (double)((double)current/(double)goal ) * 100;
+        }
+
+        int color = Color.BLUE;
+
+        if(progress < 25){
+            //red
+            color = Color.rgb(255,10,10);
+        } else if(progress >= 25 && progress < 50) {
+            //yorange
+            color = Color.rgb(255,100,10);
+        } else if(progress >= 50 && progress < 75){
+            //yellow
+            color = Color.rgb(200,200,10);
+        } else if(progress >= 75){
+            //green
+            color = Color.GREEN;
+        }
+
+        Drawable progressDrawable = bar.getProgressDrawable().mutate();
+        progressDrawable.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
+
+        bar.setProgressDrawable(progressDrawable);
+        bar.setMax(100);
+        bar.setProgress((int)progress);
+
+        return (int)progress;
+    }
+
     private void updateStepsView(int steps){
-        stepsTextView.setText(steps + " taken");
+        stepsTextView.setText(steps + " steps taken");
+        int stepGoal = Integer.parseInt(preferences.getString("key_steps", "0"));
+        int progress = updateProgressBar(steps, stepGoal, stepProgressBar);
+        int remaining = Math.max(0, (stepGoal-steps) );
+
+        stepPercentageTextView.setText(progress + "% of daily step target. " +  remaining + " steps to go!");
     }
 
 
@@ -124,41 +171,9 @@ public class DailyFragment extends Fragment
             //display current weight
             weightValueTextView.setText(LogDate.getFormattedWeight(currentWeight, isMetric));
 
-            double progress;
+            int progress = updateProgressBar((int)currentWeight, targetWeight, weightProgressBar);
 
-            //update progress bar
-            if(currentWeight > targetWeight){
-                //loose weight
-                progress = (double)((double)targetWeight / (double)currentWeight) * 100;
-            } else {
-                //gain weight
-                progress = (double)((double)currentWeight/(double)targetWeight ) * 100;
-            }
-
-            int color = Color.BLUE;
-
-            if(progress < 25){
-                //red
-                color = Color.rgb(255,10,10);
-            } else if(progress >= 25 && progress < 50) {
-                //yorange
-                color = Color.rgb(255,100,10);
-            } else if(progress >= 50 && progress < 75){
-                //yellow
-                color = Color.rgb(200,200,10);
-            } else if(progress >= 75){
-                //green
-                color = Color.GREEN;
-            }
-
-            Drawable progressDrawable = weightProgressBar.getProgressDrawable().mutate();
-            progressDrawable.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
-            weightProgressBar.setProgressDrawable(progressDrawable);
-
-            weightProgressBar.setMax(100);
-            weightProgressBar.setProgress((int)progress);
-
-            weightGoalTextView.setText((int)progress + "% of the way to achieving your weight goal!");
+            weightGoalTextView.setText((int)progress + "% of your weight goal achieved!");
             targetWeightTextView.setText(LogDate.getFormattedWeight(targetWeight, isMetric));
             
         } else {
@@ -171,13 +186,15 @@ public class DailyFragment extends Fragment
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         //update weight
         displayCurrentWeight();
+        updateStepsView(storage.getStepsToday());
     }
 
     @Override
     public void step(long timeNs) {
-        numSteps++;
+//        numSteps++;
+        storage.logStep();
         Log.d(MainActivity.DEBUG_TAG,"step taken! " + numSteps);
-        updateStepsView(numSteps);
+        updateStepsView(storage.getStepsToday());
 
     }
 

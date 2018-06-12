@@ -13,24 +13,26 @@
         android:id="@+id/stepCountTextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.5"
-        android:gravity="center_horizontal"
-        android:text="1337 Steps" />
+        android:layout_weight="1"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="1337 Steps"
+        android:textSize="24sp" />
 
     <ProgressBar
         android:id="@+id/stepCountProgressBar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="0.5" />
 
     <TextView
         android:id="@+id/stepPercentageTextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.5"
-        android:gravity="center_horizontal"
-        android:text="50% of daily steps goal" />
+        android:gravity="center_vertical|center_horizontal"
+        android:text="50% of daily steps goal"
+        android:textSize="18sp" />
 
 
     <ProgressBar
@@ -38,15 +40,16 @@
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="0.5" />
 
     <TextView
         android:id="@+id/weightGoalTextView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.5"
-        android:gravity="center_horizontal"
-        android:text="50% of weight goal" />
+        android:gravity="center_vertical|center_horizontal"
+        android:text="50% of weight goal"
+        android:textSize="18sp" />
 
     <LinearLayout
         android:id="@+id/weightLinearLayout"
@@ -57,10 +60,12 @@
 
         <TextView
             android:id="@+id/weightTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="160dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/weightHeading" />
+            android:gravity="left|center_vertical"
+            android:text="@string/weightHeading"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/weightValueTextView"
@@ -68,8 +73,10 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:ems="10"
+            android:gravity="center_vertical"
             android:inputType="textPersonName"
-            android:text="50kg" />
+            android:text="50kg"
+            android:textSize="24sp" />
 
     </LinearLayout>
 
@@ -85,14 +92,18 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="0.5"
-            android:text="@string/weightTarget" />
+            android:gravity="left|center_vertical"
+            android:text="@string/weightTarget"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/targetWeightTextView"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="3"
-            android:text="TextView" />
+            android:gravity="center_vertical"
+            android:text="TextView"
+            android:textSize="24sp" />
 
     </LinearLayout>
 

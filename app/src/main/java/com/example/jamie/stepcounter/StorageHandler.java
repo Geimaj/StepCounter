@@ -4,16 +4,11 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -21,16 +16,98 @@ public class StorageHandler {
 
     private Context ctx;
     private String weightFilename = "weights";
+    private String stepFilename = "steps";
     private File path;
     private File weightFile;
+    private File stepFile;
 
     public StorageHandler(Context ctx){
         this.ctx = ctx;
         path = ctx.getFilesDir();
         weightFile = new File(path, weightFilename);
-
+        stepFile = new File(path,stepFilename);
 //        weightFile.getParentFile().mkdirs();
+        try {
+            weightFile.createNewFile();
+            stepFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    public void logStep(){
+        ArrayList<LogStep> allSteps = getLogSteps();
+        LogStep currentSteps = null;
+        Date today = new Date();
+
+        //make sure theres entries and the last one is from today
+        if(allSteps.size() > 0 && allSteps.get(allSteps.size()-1).getDate().getDate() == today.getDate()){
+            Log.d(MainActivity.DEBUG_TAG, "Entries for today! INC");
+            allSteps.get(allSteps.size()-1).step();
+        } else { //no entries for today, add one
+            allSteps.add(new LogStep(0,today));
+            Log.d(MainActivity.DEBUG_TAG,"NO STEPS TODAY YET");
+        }
+
+        //save current steps
+        try {
+            FileOutputStream fos = new FileOutputStream(stepFile, false);
+            for(LogStep ls : allSteps){
+                String line = ls.toString() + "\n";
+                fos.write(line.getBytes());
+            }
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public LogStep getStepsForDate(Date date){
+        for(LogStep step : getLogSteps()){
+            if(step.getDate().getDate() == (date.getDate())){
+                return  step;
+            }
+        }
+
+        return null;
+    }
+
+    public int getStepsToday(){
+        Date today = new Date();
+        return getStepsForDate(today) == null ? 0 : getStepsForDate(today).getSteps();
+    }
+
+    public LogStep getLastSteps(){
+        //return last element from file
+        return getLogSteps().size() >= 1 ? getLogSteps().get(getLogSteps().size()-1) : null;
+    }
+
+    public ArrayList<LogStep> getLogSteps(){
+        ArrayList<LogStep> steps = new ArrayList<>();
+
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(stepFile));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                String[] tokens = line.split(",");
+                int step = Integer.parseInt(tokens[0]);
+                Date date = new Date(tokens[1]);
+                LogStep ls = new LogStep(step,date);
+                steps.add(ls);
+            }
+            br.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return steps;
     }
 
     public void logWeight(String weight, boolean isMetric){
