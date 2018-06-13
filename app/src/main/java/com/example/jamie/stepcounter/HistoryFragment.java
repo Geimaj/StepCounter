@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import javax.xml.datatype.Duration;
 
 
 /**
@@ -95,103 +98,109 @@ public class HistoryFragment extends Fragment {
         graph.clear();
 
         final ArrayList<LogStep> logSteps = storageHandler.getLogSteps();
-        ArrayList<Entry> entries = new ArrayList<>();
-
-        int i = 0;
-        for(LogStep ls : logSteps){
-            entries.add(new Entry(i,ls.getSteps()));
-            i++;
-        }
-        int currentSteps = storageHandler.getStepsToday();
-        int targetSteps = Integer.parseInt(DailyFragment.preferences.getString("key_steps","0"));
-        float min = Math.min(targetSteps, currentSteps) - 100;
-        float max = Math.max(targetSteps, currentSteps) + 100;
-
-
-
-        //add entries to dataset
-        LineDataSet dataSet = new LineDataSet(entries, "Steps");
-        dataSet.setColor(Color.MAGENTA);
-        dataSet.setValueTextColor(Color.BLUE);
-        dataSet.setValueTextSize(12f);
-        dataSet.setLineWidth(4f);
-        dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-
-        //add target weight line
-        LimitLine stepGoalLine = new LimitLine((float) targetSteps, "Target Steps");
-        stepGoalLine.setLineColor(Color.RED);
-        stepGoalLine.setLineWidth(2f);
-        stepGoalLine.setTextColor(Color.BLACK);
-        stepGoalLine.setTextSize(12f);
-
-        //add datasets to LineData
-        LineData data = new LineData(dataSet);
-        //set data
-        graph.setData(data);
-
-        //format data
-        IAxisValueFormatter formatter = new IAxisValueFormatter() {
-
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM");
-                int index = (int) value;
-                Date target;
-
-                Log.d(MainActivity.DEBUG_TAG, "INDEX: " + index);
-
-                if(index < 0){
-                    //return day before logweights[0]
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(logSteps.get(0).getDate());
-                    cal.add(Calendar.DATE, -1);
-                    target = cal.getTime();
-                } else if(index >= logSteps.size()-1){
-                    //return day after logweights[size]
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(logSteps.get(logSteps.size()-1).getDate());
-                    cal.add(Calendar.DATE, 1);
-                    target = cal.getTime();
-                } else {
-                    //return formatted date
-                    target = logSteps.get(index).getDate();
-                }
-                String result = formatter.format(target);
-                Log.d(MainActivity.DEBUG_TAG, "RESULT: " + result);
-                return formatter.format(target);
-//                return new DateFormatSymbols().getMonths()[(int)value];
+        if(logSteps.size() > 0) {
+            ArrayList<Entry> entries = new ArrayList<>();
+            int minSteps = Integer.MAX_VALUE;
+            int maxSteps = Integer.MIN_VALUE;
+            int i = 0;
+            for (LogStep ls : logSteps) {
+                entries.add(new Entry(i, ls.getSteps()));
+                minSteps = Math.min(minSteps, ls.getSteps());
+                maxSteps = Math.max(maxSteps, ls.getSteps());
+                i++;
             }
+            int currentSteps = storageHandler.getStepsToday();
+            int targetSteps = Integer.parseInt(DailyFragment.preferences.getString("key_steps", "0"));
+            float min = Math.min(targetSteps, minSteps) - 100;
+            float max = Math.max(targetSteps, maxSteps) + 100;
 
-        };
 
-        //format x axis labels
-        XAxis xAxis = graph.getXAxis();
-        xAxis.setGranularity(1f);
-        xAxis.setValueFormatter(formatter);
-        xAxis.setTextSize(14f);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            //add entries to dataset
+            LineDataSet dataSet = new LineDataSet(entries, "Steps");
+            dataSet.setColor(Color.MAGENTA);
+            dataSet.setValueTextColor(Color.BLUE);
+            dataSet.setValueTextSize(12f);
+            dataSet.setLineWidth(4f);
+            dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 
-        YAxis y = graph.getAxisLeft();
-        y.setTextSize(14f);
-        //set range
-        y.setAxisMinimum(min);
-        y.setAxisMaximum(max);
-        //add target weight
-        y.removeAllLimitLines();
-        y.addLimitLine(stepGoalLine);
+            //add target weight line
+            LimitLine stepGoalLine = new LimitLine((float) targetSteps, "Target Steps");
+            stepGoalLine.setLineColor(Color.RED);
+            stepGoalLine.setLineWidth(2f);
+            stepGoalLine.setTextColor(Color.BLACK);
+            stepGoalLine.setTextSize(12f);
 
-        YAxis right = graph.getAxisRight();
-        right.setDrawAxisLine(false);
-        right.setDrawAxisLine(false);
-        right.setDrawGridLines(false);
-        right.setEnabled(false);
-        Description desc = new Description();
-        desc.setText("Steps activity");
+            //add datasets to LineData
+            LineData data = new LineData(dataSet);
+            //set data
+            graph.setData(data);
+
+            //format data
+            IAxisValueFormatter formatter = new IAxisValueFormatter() {
+
+                @Override
+                public String getFormattedValue(float value, AxisBase axis) {
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM");
+                    int index = (int) value;
+                    Date target;
+
+                    Log.d(MainActivity.DEBUG_TAG, "INDEX: " + index);
+
+                    if (index < 0) {
+                        //return day before logweights[0]
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(logSteps.get(0).getDate());
+                        cal.add(Calendar.DATE, -1);
+                        target = cal.getTime();
+                    } else if (index >= logSteps.size() - 1) {
+                        //return day after logweights[size]
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(logSteps.get(logSteps.size() - 1).getDate());
+                        cal.add(Calendar.DATE, 1);
+                        target = cal.getTime();
+                    } else {
+                        //return formatted date
+                        target = logSteps.get(index).getDate();
+                    }
+                    String result = formatter.format(target);
+                    Log.d(MainActivity.DEBUG_TAG, "RESULT: " + result);
+                    return formatter.format(target);
+//                return new DateFormatSymbols().getMonths()[(int)value];
+                }
+
+            };
+
+            //format x axis labels
+            XAxis xAxis = graph.getXAxis();
+            xAxis.setGranularity(1f);
+            xAxis.setValueFormatter(formatter);
+            xAxis.setTextSize(14f);
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+
+            YAxis y = graph.getAxisLeft();
+            y.setTextSize(14f);
+            //set range
+            y.setAxisMinimum(min);
+            y.setAxisMaximum(max);
+            //add target weight
+            y.removeAllLimitLines();
+            y.addLimitLine(stepGoalLine);
+
+            YAxis right = graph.getAxisRight();
+            right.setDrawAxisLine(false);
+            right.setDrawAxisLine(false);
+            right.setDrawGridLines(false);
+            right.setEnabled(false);
+            Description desc = new Description();
+            desc.setText("Steps activity");
 
 //        graph.setDes
-        graph.setDescription(desc);
-        graph.setExtraOffsets(10,10,15,10);
-        graph.invalidate();
+            graph.setDescription(desc);
+            graph.setExtraOffsets(10, 10, 15, 10);
+            graph.invalidate();
+        } else {
+            Toast.makeText(getContext(),"No data to display", Toast.LENGTH_LONG).show();
+        }
 
     }
 
@@ -316,6 +325,7 @@ public class HistoryFragment extends Fragment {
         right.setDrawAxisLine(false);
         right.setDrawGridLines(false);
         right.setEnabled(false);
+
         Description desc = new Description();
         desc.setText("Weight activity");
 
