@@ -151,7 +151,7 @@ public class DailyFragment extends Fragment
         int stepGoal = Integer.parseInt(preferences.getString("key_steps", "0"));
         int progress = updateProgressBar(steps, stepGoal, stepProgressBar);
         int remaining = Math.max(0, (stepGoal-steps) );
-
+        if(remaining == 0) progress = 100;
         stepPercentageTextView.setText(progress + "% of daily step target. " +  remaining + " steps to go!");
     }
 
